@@ -6,17 +6,17 @@ from utils import dictionaries_distance
 class DCDL:
     def __init__(
         self, 
-        lambda_val=0.1, 
+        lambda_val=0.1, # penalty function: Minimax Concave Penalty (MCP), lambda > 0, gamma > 1
         gamma=50000, 
         max_iter=1000, 
         length_gain=30, 
-        snr=20,
-        inner_iter_max=1,
-        tolerance=1e-5,
-        epsilon=1e-6,
-        dict_rows=30,
-        dict_cols=50,
-        cardinality=1
+        snr=20, # Noise. The modified parameters are possibly required when SNR is low.
+        inner_iter_max=1, # Dictionary updating inneriiteration maximum. If 1 is hard to reach good result, try increasing, for instance, 10.
+        tolerance=1e-5, # dictionary updating tolerance
+        epsilon=1e-6, # numerical optimization 
+        dict_rows=30, # For generating dictionary, row dimensional
+        dict_cols=50, # For generating dictionary, col dimensional
+        cardinality=1, # cardinality, the number of non-zeros
     ):
         """
         Initialize DCDL (Dictionary Learning with Difference of Convex programming) algorithm.
@@ -64,11 +64,11 @@ class DCDL:
         Generate ground truth dictionary and data based on initialized parameters.
         """
         # Generate ground truth dictionary
-        self.dictionary_true = np.random.randn(self.dict_rows, self.dict_cols)
-        self.dictionary_true /= np.linalg.norm(self.dictionary_true, axis=0)
+        self.dictionary_true = np.random.randn(self.dict_rows, self.dict_cols) # generate by using random 
+        self.dictionary_true /= np.linalg.norm(self.dictionary_true, axis=0) # normalize ground truth dictionary
         
         # Calculate data length
-        L = self.dict_cols * self.length_gain
+        L = self.dict_cols * self.length_gain # dim_length, signal and coefficient
         
         # Generate coefficient matrix
         self.x_coef_matrix = np.zeros((self.dict_cols, L))
@@ -85,11 +85,13 @@ class DCDL:
         if self.snr != np.inf:
             noise_std = np.std(self.y_data_matrix.ravel()) * 10**(-self.snr/20)
             noise = np.random.randn(*self.y_data_matrix.shape) * noise_std
+
+            # Noise signal 
             self.y_data_matrix += noise
         
         # Initialize dictionary
         self.dictionary = np.random.randn(self.dict_rows, self.dict_cols)
-        self.dictionary /= np.linalg.norm(self.dictionary, axis=0)
+        self.dictionary /= np.linalg.norm(self.dictionary, axis=0) # normalize generated dictionary
     
     def solve(self):
         """
