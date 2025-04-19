@@ -7,7 +7,7 @@ Pkg.instantiate()
 ```
 
 ```julia
-juliausing DCDL
+using DCDL
 
 # Create solver with default parameters
 solver = DCDLSolver()
